@@ -1,0 +1,41 @@
+{
+  "name": "folderdb",
+  "description": "store files with searchable key value attributes",
+  "version": "0.1.0",
+  "author": "Jesse Smith <jessebsmith@gmail.com>",
+  "main": "./lib/folderdb.js",
+  "dependencies": {
+    "fs-extra": "0.15.0",
+    "lodash": "3.0.0",
+    "mongoose": "3.8.9"
+  },
+  "devDependencies": {
+    "assert": "1.3.0",
+    "should": "4.0.4",
+    "supertest": "0.13.0"
+  },
+  "scripts": {
+    "test": "mocha ./tests"
+  },
+  "_from": "folderdb@",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jessebsmith/folderdb"
+  },
+  "keywords": [
+    "file",
+    "attributes",
+    "database",
+    "mongo",
+    "key",
+    "value"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jessebsmith/folderdb/issues"
+  },
+  "homepage": "https://github.com/jessebsmith/folderdb"
+}
