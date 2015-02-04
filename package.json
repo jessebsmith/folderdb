@@ -1,7 +1,7 @@
 {
   "name": "folderdb",
   "description": "store files with searchable key value attributes",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Jesse Smith <jessebsmith@gmail.com>",
   "main": "./lib/folderdb.js",
   "dependencies": {

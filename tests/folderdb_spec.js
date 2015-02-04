@@ -46,7 +46,7 @@ describe('folderdb service tests with mongo', function () {
     var filePath = tempFolder + '/storeFileTest.txt'
     fs.writeFileSync(filePath, 'test')
 
-    myFolder.store(filePath, [], function () {
+    myFolder.store(filePath, null, function () {
       done()
     })
   })
@@ -58,7 +58,7 @@ describe('folderdb service tests with mongo', function () {
     var newFilePath = tempFolder + '/replaceFileTest2.txt'
     fs.writeFileSync(newFilePath, 'test2')
 
-    myFolder.store(oldFilePath, [], function (fileId) {
+    myFolder.store(oldFilePath, null, function (fileId) {
       myFolder.replace(fileId, newFilePath, function (file) {
         assert.equal(file._id.toString(), fileId.toString())
 
@@ -76,13 +76,37 @@ describe('folderdb service tests with mongo', function () {
     var filePath = tempFolder + '/updateFileAttributeTest.txt'
     fs.writeFileSync(filePath, 'test')
 
-    var attributes = [{attribute: 1}]
+    var attributes = {
+      attribute1: 1
+    }
 
     myFolder.store(filePath, attributes, function (fileId) {
-      var newAttributes = [{newAttribute: 2}]
+      var newAttributes = {
+        attribute2: 2
+      }
 
       myFolder.update(fileId, newAttributes, function (file) {
         assert.deepEqual(file.attributes, newAttributes)
+        done()
+      })
+    })
+  })
+
+  it('should update a file attribute with correct format', function (done) {
+    var filePath = tempFolder + '/updateFileAttributeTest.txt'
+    fs.writeFileSync(filePath, 'test')
+
+    var attributes = [
+      {attribute1: 1}
+    ]
+
+    myFolder.store(filePath, attributes, function (fileId) {
+      var newAttributes = [
+        {attribute2: 2}
+      ]
+
+      myFolder.update(fileId, newAttributes, function (file) {
+        assert.deepEqual(file.attributes, newAttributes[0])
         done()
       })
     })
@@ -92,9 +116,32 @@ describe('folderdb service tests with mongo', function () {
     var filePath = tempFolder + '/findFileTest.txt'
     fs.writeFileSync(filePath, 'test')
 
-    myFolder.store(filePath, [], function (fileId) {
+    myFolder.store(filePath, null, function (fileId) {
       myFolder.find(fileId, function (file) {
         assert.equal(file._id.toString(), fileId.toString())
+        done()
+      })
+    })
+  })
+
+  it('should return valid attribute format', function (done) {
+    var filePath = tempFolder + '/findValidFileTest.txt'
+    fs.writeFileSync(filePath, 'test')
+
+    var outputAttributes = {
+      attribute1: 'value',
+      attribute2: 'value2'
+    }
+
+    var inputAttributes = [
+      {attribute1: 'value'},
+      {attribute2: 'value2'}
+    ]
+
+    myFolder.store(filePath, inputAttributes, function (fileId) {
+      myFolder.find(fileId, function (file) {
+        assert.equal(file._id.toString(), fileId.toString())
+        assert.deepEqual(file.attributes, outputAttributes)
         done()
       })
     })
@@ -104,7 +151,7 @@ describe('folderdb service tests with mongo', function () {
     var filePath = tempFolder + '/deleteFileTest.txt'
     fs.writeFileSync(filePath, 'test')
 
-    myFolder.store(filePath, [], function (fileId) {
+    myFolder.store(filePath, null, function (fileId) {
       myFolder.delete(fileId, function () {
         assert.throws(myFolder.find(fileId, function () {
           done()
@@ -117,11 +164,11 @@ describe('folderdb service tests with mongo', function () {
     var filePath = tempFolder + '/findFileTest.txt'
     fs.writeFileSync(filePath, 'test')
 
-    var attributes = [
-      {attribute1: 'string'},
-      {attribute2: 2},
-      {attribute3: new Date(new Date().setDate(new Date().getDate() - 1))}
-    ]
+    var attributes = {
+        attribute1: 'string',
+        attribute2: 2,
+        attribute3: new Date(new Date().setDate(new Date().getDate() - 1))
+    }
 
     myFolder.store(filePath, attributes, function (fileId) {
       var conditions = {
@@ -136,11 +183,34 @@ describe('folderdb service tests with mongo', function () {
     })
   })
 
+  it('should query a file that uses array for attributes', function (done) {
+    var filePath = tempFolder + '/findFileTest.txt'
+    fs.writeFileSync(filePath, 'test')
+
+    var attributes = [
+      {attribute4: 'string'},
+      {attribute5: 2},
+      {attribute6: new Date(new Date().setDate(new Date().getDate() - 1))}
+    ]
+
+    myFolder.store(filePath, attributes, function (fileId) {
+      var conditions = {
+        attribute4: 'string',
+        attribute5: { $gt: 1 },
+        attribute6: { $lt: new Date() }
+      }
+      myFolder.query(conditions, null, function (files) {
+        assert.equal(files[0]._id.toString(), fileId)
+        done()
+      })
+    })
+  })
+
   it('should read a file', function (done) {
     var filePath = tempFolder + '/readFileTest.txt'
     fs.writeFileSync(filePath, 'test')
 
-    myFolder.store(filePath, [], function (fileId) {
+    myFolder.store(filePath, null, function (fileId) {
       myFolder.read(fileId, {encoding: 'UTF-8'}, function (data, file) {
         assert.equal(file._id.toString(), fileId)
         assert.equal(data, 'test')
@@ -154,14 +224,17 @@ describe('folderdb service tests with mongo', function () {
     fs.writeFileSync(filePath, 'test')
 
     var attributes = [
-      {attribute1: 'string'},
+      {attribute1: 1},
       {attribute2: 2},
-      {attribute3: new Date()}
+      {attribute3: 3},
+      {attribute4: 4},
+      {attribute5: 5},
+      {attribute6: 6}
     ]
 
-    myFolder.store(filePath, attributes, function () {
+    myFolder.store(filePath, null, function () {
       myFolder.attributes(function (listOfAttributes) {
-        assert.notEqual(listOfAttributes.length, 0)
+        assert.equal(listOfAttributes.length, 6)
         done()
       })
     })

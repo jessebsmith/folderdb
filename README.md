@@ -8,6 +8,10 @@ This makes it easier to keep track of files across applications as well as withi
 
 folderdb uses Mongo to store attributes
 
+## Install
+
+    npm install folderdb
+
 ## Setup
 
 ```javascript
@@ -33,11 +37,12 @@ folderdb uses Mongo to store attributes
 
 __store(filePath, attributes, fn)__
 
-Moves the file to folder location and stores any attributes to mongo. Returns the file's ObjectId.
+Moves the file to folder location and stores any attributes to mongo. Returns
+ the file's ObjectId.
 
 ```javascript
 
-    myFolder.store('path/to/file', [{attribute1: value}, {attribute2: value}], fn(fileId) {})
+    myFolder.store('path/to/file', {attribute1: value, attribute2: value}, fn(fileId) {})
 
 ```
 
@@ -51,13 +56,13 @@ Replaces an existing file. Updates file name and extension from new file.
 
 ```
 
-__update(id, filePath, fn)__
+__update(id, attributes, fn)__
 
 Replaces all the attributes for a file.
 
 ```javascript
 
-    myFolder.update(fileId, [{attribute3: value}, {attribute4: value}], fn(file) {})
+    myFolder.update(fileId, {attribute3: value, attribute4: value}, fn(file) {})
 
 ```
 
@@ -102,11 +107,11 @@ Returns a list of files that meet all conditions.
     // }
     
     myFolder.query(conditions, options, fn(listOfFiles) {
-      // listOfFiles[0].attributes = [
-      //   {attribute1: 'string'},
-      //   {attribute2: 2,
-      //   {attribute3: Thu Jan 1 2015 15:00:00 GMT-0800 (PST)}
-      // ]
+      // listOfFiles[0].attributes = {
+      //   attribute1: 'string',
+      //   attribute2: 2,
+      //   attribute3: Thu Jan 1 2015 15:00:00 GMT-0800 (PST)
+      // }
     })
 
 ```
@@ -123,7 +128,7 @@ Returns the file's data and file object.
       encoding: 'UTF-8',
       flag: 'r'
     }
-    myFolder.read(fileId, fn(data, file) {})
+    myFolder.read(fileId, readOptions, fn(data, file) {})
 
 ```
 
@@ -144,7 +149,9 @@ Returns a list of used attributes.
 
 ```
 
-## File Object
+## Notes
+
+### File Object
 
 ```javascript
 
@@ -152,11 +159,34 @@ Returns a list of used attributes.
       { _id: 54cae43f9f5be0dd3ee02ae3,
         folder: 'myFolder',
         name: 'fileName.jpg',
-        attributes: [ 
-          { attribute1: value },
-          { attribute2: value }
-        ] 
+        attributes: { 
+            attribute1: value,
+            attribute2: value
+        }
       }
     ]
+
+```
+
+### Attributes
+
+Attributes can be defined one of two ways when saving or updating. However, they
+ will be saved as an object and not as an array.
+
+```javascript
+    
+    // valid
+    var attributes1 = [
+        {attribute1: value},
+        {attribute2: value},
+    ]
+    myFolder.store('path/to/file', attributes1, function(fileId) {})
+    
+    // also valid
+    var attributes2 = {
+        attribute1: value,
+        attribute2: value,
+    }
+    myFolder.store('path/to/file', attributes2, function(fileId) {})
 
 ```
